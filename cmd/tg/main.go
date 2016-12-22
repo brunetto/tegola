@@ -5,5 +5,6 @@ import (
 )
 
 func main () {
-
+	b := tg.LoadBot("tegola.json")
+	b.GetUpdates()
 }
