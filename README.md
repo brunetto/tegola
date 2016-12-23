@@ -1,7 +1,7 @@
 # tegola
-TElegram GOlang Little Api
+Testing my tElegram GOlang Little Api
 
-My little Telegram Golang API to learn both Telegram and RESTful API programming.
+My little Telegram Golang API to learn and test both Telegram and RESTful API programming.
 
 ## References
 
