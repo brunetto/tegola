@@ -1,5 +1,7 @@
 {
   "BotName": "",
   "BotUser": "",
-  "BotToken": ""
+  "BotToken": "",
+  "ChatId": 0,
+  "TimeZone": "",
 }
