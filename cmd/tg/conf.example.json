@@ -4,4 +4,18 @@
   "BotToken": "",
   "ChatId": 0,
   "TimeZone": "",
+  "Admin": [
+    {
+      "Id": 0,
+      "Username":"",
+      "UserChat": 0
+    }
+  ],
+  "AllowedUsers": [
+    {
+      "Id": 0,
+      "Username":""
+    }
+  ],
+  "AllowedChats":[0]
 }
