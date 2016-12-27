@@ -2,6 +2,7 @@ package tegola
 
 import (
 	"time"
+	"github.com/brunetto/figa"
 )
 
 type Bot struct {
@@ -13,6 +14,7 @@ type Bot struct {
 	Admin []User
 	AllowedUsers []User
 	AllowedChats []int64
+	FAppConf figa.FAppConf
 }
 
 type Updates struct {

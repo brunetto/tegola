@@ -17,5 +17,9 @@
       "Username":""
     }
   ],
-  "AllowedChats":[0]
+  "AllowedChats":[0],
+  "FirebaseConf": {
+    "ProjectId": "",
+    "ProjectKey": ""
+  }
 }
