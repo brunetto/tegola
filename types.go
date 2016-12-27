@@ -14,7 +14,7 @@ type Bot struct {
 	Admin []User
 	AllowedUsers []User
 	AllowedChats []int64
-	FAppConf figa.FAppConf
+	FAppConf figa.FApp
 }
 
 type Updates struct {
