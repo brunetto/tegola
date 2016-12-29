@@ -33,7 +33,7 @@ type Message struct {
 	DateTime string
 	Text string `json:"text"`
 	Location Location `json:"location"`
-	From From `json:"from"`
+	From User `json:"from"`
 	Chat Chat `json:"chat"`
 }
 
@@ -50,26 +50,23 @@ func (m *Message) ReadTime (timezone string) error {
 	return err
 }
 
-type From struct {
+type User struct {
 	Id int64 `json:"id"`
 	FirstName string `json:"first_name"`
+	LastName string `json:"last_name"`
 	Username string `json:"username"`
-}
-
-type User struct {
-	Id int64
-	FirstName string
-	Username string
-	UserChat int64
 }
 
 type Chat struct {
 	Id int64 `json:"id"`
-	FirstName string `json:"first_name"`
-	Username string `json:"username"`
-	Type string `json:"type"`
+	FirstName string `json:"first_name"` // Optional. First name of the other party in a private chat
+	Username string `json:"username"` // Optional. Username, for private chats, supergroups and channels if available
+	Type string `json:"type"` // can be either “private”, “group”, “supergroup” or “channel”
+	Title string `json:"title"` // Optional. Title, for supergroups, channels and group chats
+	LastName string `json:"last_name"` //		Optional. Last name of the other party in a private chat
+	AllMembersAreAdministrators bool `json:"all_members_are_administrators"`//		Optional. True if a group has ‘All Members Are Admins’ enabled.
 }
-
+//https://core.telegram.org/bots/api#available-types
 type OutGoingMsg struct {
 	ChatId int64 `json:"chat_id"`
 	Text string `json:"text"`
@@ -89,7 +86,7 @@ func (b *Bot) IsAllowedChat ( chatId int64 ) bool {
 	return false
 }
 
-func (b *Bot) IsAllowedUser ( from From ) bool {
+func (b *Bot) IsAllowedUser ( from User ) bool {
 	for _, user := range b.AllowedUsers {
 		if from.Id == user.Id && from.Username == user.Username {
 			return true
