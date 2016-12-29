@@ -8,7 +8,7 @@ import (
 
 func main () {
 	var (
-		allowed, forbidden []tg.Result
+		allowed, forbidden []tg.Update
 		err error
 		b tg.Bot
 		reply tg.Message
@@ -22,7 +22,7 @@ func main () {
 	fmt.Printf("Allowed:\n%+v\n", allowed)
 	fmt.Printf("Forbidden:\n%+v\n", forbidden)
 
-	reply, err = b.SendSimpleMsg("Test")
+	reply, err = b.SendSimpleMessage("Test")
 	if err != nil {
 		log.Fatal(err)
 	}

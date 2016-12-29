@@ -1,14 +1,14 @@
 package tegola
 
 import (
-	"log"
 	"github.com/brunetto/goutils/conf"
+	"log"
 )
 
-func LoadBot (fileName string) Bot {
+func LoadBot(fileName string) Bot {
 	var (
 		err error
-		c = Bot{}
+		c   = Bot{}
 	)
 	err = conf.LoadJsonConf(fileName, &c)
 	if err != nil {
