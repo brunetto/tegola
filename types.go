@@ -93,7 +93,7 @@ type Message struct {
 	// Optional. For replies, the original message.
 	// Note that the Message object in this field will not contain
 	// further reply_to_message fields even if it itself is a reply.
-	ReplyToMessage Message `json:"reply_to_message"`
+	ReplyToMessage SecondLevelMessage `json:"reply_to_message"`
 	// Optional. Date the message was last edited in Unix time
 	EditDate int64 `json:"edit_date"`
 	// Optional. For text messages, special entities like usernames, URLs, bot commands, etc. that appear in the text
@@ -157,7 +157,42 @@ type Message struct {
 	// Optional. Specified message was pinned.
 	// Note that the Message object in this field will not contain further
 	// reply_to_message fields even if it is itself a reply.
-	PinnedMessage Message `json:"pinned_message"`
+	PinnedMessage SecondLevelMessage `json:"pinned_message"`
+}
+
+type SecondLevelMessage struct {
+	MessageId             int64           `json:"message_id"`
+	Chat                  Chat            `json:"chat"`
+	Date                  int64           `json:"date"`
+	Text                  string          `json:"text"`
+	Location              Location        `json:"location"`
+	From                  User            `json:"from"`
+	ForwardFrom           User            `json:"forward_from"`
+	ForwardFromChat       Chat            `json:"forward_from_chat"`
+	ForwardFromMessageId  int64           `json:"forward_from_message_id"`
+	ForwardDate           int64           `json:"forward_date"`
+	EditDate              int64           `json:"edit_date"`
+	Entities              []MessageEntity `json:"entities"`
+	Audio                 Audio           `json:"audio"`
+	Document              Document        `json:"document"`
+	Game                  Game            `json:"game"`
+	Photo                 []PhotoSize     `json:"photo"`
+	Sticker               Sticker         `json:"sticker"`
+	Video                 Video           `json:"video"`
+	Voice                 Voice           `json:"voice"`
+	Caption               string          `json:"caption"`
+	Contact               Contact         `json:"contact"`
+	Venue                 Venue           `json:"venue"`
+	NewChatMember         User            `json:"new_chat_member"`
+	LeftChatMember        User            `json:"left_chat_member"`
+	NewChatTitle          string          `json:"new_chat_title"`
+	NewChatPhoto          []PhotoSize     `json:"new_chat_photo"`
+	DeleteChatPhoto       bool            `json:"delete_chat_photo"`
+	GroupChatCreated      bool            `json:"group_chat_created"`
+	SupergroupChatCreated bool            `json:"supergroup_chat_created"`
+	ChannelChatCreated    bool            `json:"channel_chat_created"`
+	MigrateToChatId       int64           `json:"migrate_to_chat_id"`
+	MigrateFromChatId     int64           `json:"migrate_from_chat_id"`
 }
 
 // This object represents one special entity in a text message. For example, hashtags, usernames, URLs, etc.

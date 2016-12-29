@@ -11,7 +11,7 @@ func main () {
 		allowed, forbidden []tg.Update
 		err error
 		b tg.Bot
-		reply tg.Message
+		//reply tg.Message
 	)
 	b = tg.LoadBot("tegola.json")
 	allowed, forbidden, err = b.GetUpdates()
@@ -22,11 +22,11 @@ func main () {
 	fmt.Printf("Allowed:\n%+v\n", allowed)
 	fmt.Printf("Forbidden:\n%+v\n", forbidden)
 
-	reply, err = b.SendSimpleMessage("Test")
+	/*reply*/_, err = b.SendSimpleMessage("Test")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("%+v\n", reply)
+	//fmt.Printf("%+v\n", reply)
 
 }
