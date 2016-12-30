@@ -3,6 +3,10 @@ package tegola
 import (
 	"encoding/json"
 	"net/http"
+	"errors"
+
+	"github.com/brunetto/goutils/debug"
+	"log"
 )
 
 // @todo: find out if it is bettere to recycle the http client or not
@@ -15,18 +19,24 @@ func (b *Bot) SimplerGetUpdates() ([]Update, []Update, error) {
 		allowed   = []Update{}
 		forbidden = []Update{}
 	)
+	debug.LogDebug(b.Debug,"Get request")
 	resp, err = b.Get("getUpdates")
 	defer resp.Body.Close()
 	if err != nil {
-		return allowed, forbidden, err
+		return allowed, forbidden, errors.New("Failed getUpdates get requests: " + err.Error())
 	}
 
 	u = Updates{}
+
+	debug.LogDebug(b.Debug, "Decode response")
 	err = json.NewDecoder(resp.Body).Decode(&u)
 	if err != nil {
 		return allowed, forbidden, err
+	log.Fatal("pippo")
+
 	}
 
+	debug.LogDebug(b.Debug, "Filter updates")
 	allowed, forbidden = b.FilterAllowedUpdates(u)
 
 	return allowed, forbidden, err
@@ -69,6 +79,7 @@ func (b *Bot) FilterAllowedUpdates(u Updates) ([]Update, []Update) {
 		allowed   = []Update{}
 		forbidden = []Update{}
 	)
+	return u.Updates, []Update{}
 	for _, Update := range u.Updates {
 		if b.AllowedMessage(Update.Message) {
 			allowed = append(allowed, Update)
@@ -94,23 +105,23 @@ func (b *Bot) SendMessage(msgReq SendMessagePayload) (Message, error) {
 		resp *http.Response
 		err  error
 		msg  []byte
-		m    = Message{}
+		m    = SendMessageConfirm{}
 	)
 
 	msg, err = json.Marshal(msgReq)
 	if err != nil {
-		return m, err
+		return Message{}, err
 	}
 
 	resp, err = b.Post("sendMessage", msg)
 	defer resp.Body.Close()
 	if err != nil {
-		return m, err
+		return Message{}, err
 	}
 
 	// @todo: fix
 	err = json.NewDecoder(resp.Body).Decode(&m)
-	return m, err
+	return m.Message, err
 }
 
 func (b *Bot) SetWebhook() {}

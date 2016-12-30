@@ -4,6 +4,11 @@ import (
 	"bytes"
 	"net/http"
 	"time"
+	"github.com/brunetto/goutils/debug"
+	"errors"
+	"strconv"
+	"io/ioutil"
+	"log"
 )
 
 var TelegramBotApiUrl string = "https://api.telegram.org/bot"
@@ -23,12 +28,56 @@ func (m *Message) UnixToHumanDate(timezone string) (string, error) {
 	return datetime, err
 }
 
+func CheckHttpErrors (resp *http.Response, url string) (*http.Response, error) {
+	var (
+		respBytes []byte
+		respString string
+		err error
+	)
+	if resp.StatusCode != 200 {
+		respBytes, err = ioutil.ReadAll(resp.Body)
+		if err != nil {
+			log.Fatal("CheckHttpErrors: can't read http response")
+		}
+		respString = string(respBytes)
+		return resp, errors.New("HTTP error : " +
+					strconv.Itoa(resp.StatusCode) +
+					"\n" + respString +
+					"\n URL: " + url)
+	}
+	return resp, nil
+}
+
 func (b *Bot) Get(method string) (*http.Response, error) {
-	return b.Client.Get(TelegramBotApiUrl + b.BotToken + method)
+	var (
+		url string
+		resp *http.Response
+		err error
+	)
+	url = TelegramBotApiUrl + b.BotToken + "/" + method
+	debug.LogDebug(b.Debug, "Bot get url: ", url)
+	resp, err = b.Client.Get(url)
+	if err != nil {
+		return resp, err
+	}
+	resp, err = CheckHttpErrors(resp, url)
+	return resp, err
 }
 
 func (b *Bot) Post(method string, payload []byte) (*http.Response, error) {
-	return b.Client.Post(TelegramBotApiUrl+b.BotToken+method, "application/json", bytes.NewBuffer(payload))
+	var (
+		url string
+		resp *http.Response
+		err error
+	)
+	url = TelegramBotApiUrl + b.BotToken + "/" + method
+	debug.LogDebug(b.Debug, "Bot post url: ", url)
+	resp, err = b.Client.Post(url, "application/json", bytes.NewBuffer(payload))
+	if err != nil {
+		return resp, err
+	}
+	resp, err = CheckHttpErrors(resp, url)
+	return resp, err
 }
 
 // IsAllowedChat checks if the incoming chat is allowed by the user rules
@@ -58,9 +107,9 @@ func (b *Bot) AllowedMessage(m Message) bool {
 }
 
 // Debug writes debug messages to the terminal
-func (b *Bot) Debug() {
-
-}
+//func (b *Bot) Debug() {
+//
+//}
 
 // Echo repeats last user message back to the chat
 func (b *Bot) Echo() {

@@ -16,6 +16,7 @@ type Bot struct {
 	AllowedUsers []User
 	AllowedChats []int64
 	Client       *http.Client
+	Debug bool
 	// Firebase conf
 	FAppConf figa.FApp
 }
@@ -23,6 +24,11 @@ type Bot struct {
 type Updates struct {
 	Ok      bool     `json:"ok"`
 	Updates []Update `json:"result"`
+}
+
+type SendMessageConfirm struct{
+	Ok bool `json:"ok"`
+	Message Message  `json:"result"`
 }
 
 // This object represents an incoming update.
@@ -309,12 +315,12 @@ type User struct {
 // This object represents a chat.
 type Chat struct {
 	Id                          int64  `json:"id"`
-	FirstName                   string `json:"first_name"`                     // Optional. First name of the other party in a private chat
 	Username                    string `json:"username"`                       // Optional. Username, for private chats, supergroups and channels if available
+	FirstName                   string `json:"first_name"`                     // Optional. First name of the other party in a private chat
+	LastName                    string `json:"last_name"`                      // Optional. Last name of the other party in a private chat
 	Type                        string `json:"type"`                           // can be either “private”, “group”, “supergroup” or “channel”
 	Title                       string `json:"title"`                          // Optional. Title, for supergroups, channels and group chats
-	LastName                    string `json:"last_name"`                      //		Optional. Last name of the other party in a private chat
-	AllMembersAreAdministrators bool   `json:"all_members_are_administrators"` //		Optional. True if a group has ‘All Members Are Admins’ enabled.
+	AllMembersAreAdministrators bool   `json:"all_members_are_administrators"` // Optional. True if a group has ‘All Members Are Admins’ enabled.
 }
 
 // This object represents a file ready to be downloaded.
