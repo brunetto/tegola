@@ -13,8 +13,8 @@ func main () {
 		b tg.Bot
 		//reply tg.Message
 	)
-	b = tg.LoadBot("tegola.json")
-	allowed, forbidden, err = b.GetUpdates()
+	b = tg.NewBotFromJsonFile("tegola.json")
+	allowed, forbidden, err = b.SimplerGetUpdates()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -27,6 +27,5 @@ func main () {
 		log.Fatal(err)
 	}
 
-	//fmt.Printf("%+v\n", reply)
 
 }

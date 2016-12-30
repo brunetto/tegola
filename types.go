@@ -2,6 +2,7 @@ package tegola
 
 import (
 	"github.com/brunetto/figa"
+	"net/http"
 )
 
 type Bot struct {
@@ -10,10 +11,13 @@ type Bot struct {
 	BotToken     string
 	ChatId       int64
 	TimeZone     string
-	Admin        []User
+	AdminUsers   []User
+	AdminChats   []int64
 	AllowedUsers []User
 	AllowedChats []int64
-	FAppConf     figa.FApp
+	Client       *http.Client
+	// Firebase conf
+	FAppConf figa.FApp
 }
 
 type Updates struct {
@@ -160,6 +164,7 @@ type Message struct {
 	PinnedMessage SecondLevelMessage `json:"pinned_message"`
 }
 
+// Just like Message, but without ReplyToMessage, PinnedMessage to avoid recursion error on them
 type SecondLevelMessage struct {
 	MessageId             int64           `json:"message_id"`
 	Chat                  Chat            `json:"chat"`
@@ -197,19 +202,31 @@ type SecondLevelMessage struct {
 
 // This object represents one special entity in a text message. For example, hashtags, usernames, URLs, etc.
 type MessageEntity struct {
-	Type   string //t Type of the entity. Can be mention (@username), hashtag, bot_command, url, email, bold (bold text), italic (italic text), code (monowidth string), pre (monowidth block), text_link (for clickable text URLs), text_mention (for users without usernames)
-	Offset int64  // Offset in UTF-16 code units to the start of the entity
-	Length int64  // Length of the entity in UTF-16 code units
-	Url    string // Optional. For “text_link” only, url that will be opened after user taps on the text
-	User   User   // Optional. For “text_mention” only, the mentioned user
+	// Type of the entity. Can be mention (@username), hashtag, bot_command, url,
+	// email, bold (bold text), italic (italic text), code (monowidth string),
+	// pre (monowidth block), text_link (for clickable text URLs), text_mention
+	// (for users without usernames)
+	Type string
+	// Offset in UTF-16 code units to the start of the entity
+	Offset int64
+	// Length of the entity in UTF-16 code units
+	Length int64
+	// Optional. For “text_link” only, url that will be opened after user taps on the text
+	Url string
+	// Optional. For “text_mention” only, the mentioned user
+	User User
 }
 
 // This object represents one size of a photo or a file / sticker thumbnail.
 type PhotoSize struct {
-	FileId   string `json:"file_id"`   // Unique identifier for this file
-	Width    int64  `json:"width"`     // Photo width
-	Height   int64  `json:"height"`    // Photo height
-	FileSize int64  `json:"file_size"` // Optional. File size
+	// Unique identifier for this file
+	FileId string `json:"file_id"`
+	// Photo width
+	Width int64 `json:"width"`
+	// Photo height
+	Height int64 `json:"height"`
+	// Optional. File size
+	FileSize int64 `json:"file_size"`
 }
 
 // This object represents an audio file to be treated as music by the Telegram clients.
@@ -260,7 +277,7 @@ type Voice struct {
 // This object represents a video file.
 type Video struct {
 	FileId    string `json:"file_id"`   // Unique identifier for this file
-	Duration  int64  `json:"duration"`  // uration of the audio in seconds as defined by sender
+	Duration  int64  `json:"duration"`  // Duration of the audio in seconds as defined by sender
 	MimeType  string `json:"mime_type"` // Optional. MIME type of the file as defined by sender
 	File_Size int64  `json:"file_size"` // Optional. File size
 }

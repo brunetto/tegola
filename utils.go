@@ -1,6 +1,12 @@
 package tegola
 
-import "time"
+import (
+	"bytes"
+	"net/http"
+	"time"
+)
+
+var TelegramBotApiUrl string = "https://api.telegram.org/bot"
 
 // UnixToHumanDate returns the unix timestamp date in a readable format
 func (m *Message) UnixToHumanDate(timezone string) (string, error) {
@@ -15,6 +21,14 @@ func (m *Message) UnixToHumanDate(timezone string) (string, error) {
 	}
 	datetime = time.Unix(m.Date, 0).In(tz).String()
 	return datetime, err
+}
+
+func (b *Bot) Get(method string) (*http.Response, error) {
+	return b.Client.Get(TelegramBotApiUrl + b.BotToken + method)
+}
+
+func (b *Bot) Post(method string, payload []byte) (*http.Response, error) {
+	return b.Client.Post(TelegramBotApiUrl+b.BotToken+method, "application/json", bytes.NewBuffer(payload))
 }
 
 // IsAllowedChat checks if the incoming chat is allowed by the user rules
@@ -41,4 +55,29 @@ func (b *Bot) IsAllowedUser(from User) bool {
 func (b *Bot) AllowedMessage(m Message) bool {
 	allowed := b.IsAllowedChat(m.Chat.Id) && b.IsAllowedUser(m.From)
 	return allowed
+}
+
+// Debug writes debug messages to the terminal
+func (b *Bot) Debug() {
+
+}
+
+// Echo repeats last user message back to the chat
+func (b *Bot) Echo() {
+
+}
+
+// EchoDebug debugs the bot back to the chat
+func (b *Bot) EchoDebug() {
+
+}
+
+// GhostDebug debugs the bot to the admin chat
+func (b *Bot) GhostDebug() {
+
+}
+
+// ParentalControl asks admin for permission to talk to strangers
+func (b *Bot) ParentalControl() {
+
 }

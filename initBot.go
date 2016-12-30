@@ -3,9 +3,11 @@ package tegola
 import (
 	"github.com/brunetto/goutils/conf"
 	"log"
+	"net/http"
+	"time"
 )
 
-func LoadBot(fileName string) Bot {
+func NewBotFromJsonFile(fileName string) Bot {
 	var (
 		err error
 		c   = Bot{}
@@ -14,5 +16,11 @@ func LoadBot(fileName string) Bot {
 	if err != nil {
 		log.Fatal("Error reading JSON config file: ", err)
 	}
+	c = InitBot(c)
+	return c
+}
+
+func InitBot(c Bot) Bot {
+	c.Client = &http.Client{Timeout: time.Second * 10}
 	return c
 }
