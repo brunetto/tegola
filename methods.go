@@ -4,12 +4,32 @@ import (
 	"encoding/json"
 	"net/http"
 	"errors"
+	"io/ioutil"
 
 	"github.com/brunetto/goutils/debug"
-	"log"
 )
 
-// @todo: find out if it is bettere to recycle the http client or not
+func (b *Bot) GenericMethod(method string, payload []byte) ([]byte, error) {
+	var (
+		resp *http.Response
+		err error
+		response []byte
+	)
+
+	resp, err = b.Post(method, payload)
+	defer resp.Body.Close()
+	if err != nil {
+		return response, err
+	}
+
+	// Read the response into a byte array
+	response, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return response, err
+	}
+
+	return response, err
+}
 
 func (b *Bot) SimplerGetUpdates() ([]Update, []Update, error) {
 	var (
@@ -32,8 +52,6 @@ func (b *Bot) SimplerGetUpdates() ([]Update, []Update, error) {
 	err = json.NewDecoder(resp.Body).Decode(&u)
 	if err != nil {
 		return allowed, forbidden, err
-	log.Fatal("pippo")
-
 	}
 
 	debug.LogDebug(b.Debug, "Filter updates")
@@ -57,6 +75,7 @@ func (b *Bot) GetUpdates(pReq GetUpdatesPayload) ([]Update, []Update, error) {
 		return allowed, forbidden, err
 	}
 
+	// Start option 1
 	resp, err = b.Post("getUpdates", payload)
 	defer resp.Body.Close()
 	if err != nil {
@@ -68,6 +87,22 @@ func (b *Bot) GetUpdates(pReq GetUpdatesPayload) ([]Update, []Update, error) {
 	if err != nil {
 		return allowed, forbidden, err
 	}
+	// End option 1
+
+	// Start option 2
+	/*
+	var respB []byte
+	respB, err = b.GenericMethod("getUpdates", payload)
+	if err != nil {
+		return allowed, forbidden, err
+	}
+	u = Updates{}
+	err = json.Unmarshal(respB, &u)
+	if err != nil {
+		return allowed, forbidden, err
+	}
+	*/
+	// End option 2
 
 	allowed, forbidden = b.FilterAllowedUpdates(u)
 
@@ -119,7 +154,6 @@ func (b *Bot) SendMessage(msgReq SendMessagePayload) (Message, error) {
 		return Message{}, err
 	}
 
-	// @todo: fix
 	err = json.NewDecoder(resp.Body).Decode(&m)
 	return m.Message, err
 }
