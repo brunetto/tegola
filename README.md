@@ -18,3 +18,7 @@ Testing my tElegram GOlang Little Api
 * https://github.com/tucnak/telebot
 * https://aranair.github.io/posts/2016/12/25/how-to-set-up-golang-telegram-bot-with-webhooks/
 * https://github.com/aranair/remindbot
+
+# Storage
+
+https://developers.google.com/sheets/api/quickstart/go

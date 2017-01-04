@@ -114,7 +114,6 @@ func (b *Bot) FilterAllowedUpdates(u Updates) ([]Update, []Update) {
 		allowed   = []Update{}
 		forbidden = []Update{}
 	)
-	return u.Updates, []Update{}
 	for _, Update := range u.Updates {
 		if b.AllowedMessage(Update.Message) {
 			allowed = append(allowed, Update)

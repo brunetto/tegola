@@ -20,10 +20,11 @@ func main () {
 		lastUpdateId int64
 	)
 
-	b.Debug = Debug
 
 	debug.LogDebug(Debug, "Load bot from file: tegola.json" )
 	b = tg.NewBotFromJsonFile("tegola.json")
+
+	b.Debug = Debug
 
 	debug.LogDebug(Debug, "Getting updates")
 
@@ -32,15 +33,12 @@ func main () {
 
 		gp := tg.GetUpdatesPayload{Offset: lastUpdateId + 1}
 
-		allowed, forbidden , err = b. /*Simpler*/ GetUpdates(gp)
+		allowed, forbidden , err = b.GetUpdates(gp)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		debug.LogDebug(Debug, "Done")
-
-		//fmt.Printf("Allowed:\n%+v\n", allowed)
-		//fmt.Printf("Forbidden:\n%+v\n", forbidden)
+		//debug.LogDebug(Debug, "Updates checked")
 
 		for _, u := range allowed {
 			lastUpdateId = u.UpdateId
@@ -54,7 +52,7 @@ func main () {
 			}
 
 			replyText := "Echo" + "\n====" +
-					"\nSender: " + sender.Username + " - " + strconv.Itoa(int(sender.Id)) +
+					"\nSender: " + sender.Username + " - id: " + strconv.Itoa(int(sender.Id)) +
 					"\nChat: " + chatId +
 					"\nTimestamp " + date +
 					"\nUpdate n.: " + strconv.Itoa(int(u.UpdateId)) +
@@ -71,7 +69,7 @@ func main () {
 				log.Fatal(err)
 			}
 
-			fmt.Println("Echoed message sent is: ")
+			fmt.Println("Echoed message sent to chat is " + strconv.Itoa(int(u.Message.Chat.Id)) + " is: ")
 			fmt.Println(reply.Text)
 
 		}
@@ -87,8 +85,9 @@ func main () {
 				log.Fatal(err)
 			}
 
+			// Echo to admin
 			replyText := "Echo" + "\n====" +
-				"\nSender: " + sender.Username + " - " + strconv.Itoa(int(sender.Id)) +
+				"\nSender: " + sender.Username + " - id: " + strconv.Itoa(int(sender.Id)) +
 				"\nChat: " + chatId +
 				"\nTimestamp " + date +
 				"\nUpdate n.: " + strconv.Itoa(int(u.UpdateId)) +
@@ -105,7 +104,22 @@ func main () {
 				log.Fatal(err)
 			}
 
-			fmt.Println("Echoed message sent is: ")
+			fmt.Println("Echoed message sent to chat " + strconv.Itoa(int(b.AdminChats[0])) + " is: ")
+			fmt.Println(reply.Text)
+
+
+			// Notify the bot will ask for permissison
+			sp2 := tg.SendMessagePayload{
+				ChatId: u.Message.Chat.Id,
+				Text: "I can't talk to strangers, I'll ask for permission to my Admin",
+			}
+
+			reply, err = b.SendMessage(sp2)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			fmt.Println("Echoed message sent to chat " + strconv.Itoa(int(u.Message.Chat.Id)) + " is: ")
 			fmt.Println(reply.Text)
 
 		}

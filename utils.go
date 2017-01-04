@@ -84,9 +84,12 @@ func (b *Bot) Post(method string, payload []byte) (*http.Response, error) {
 func (b *Bot) IsAllowedChat(chatId int64) bool {
 	for _, id := range b.AllowedChats {
 		if chatId == id {
+			debug.LogDebug(b.Debug, "Allowed chat ", chatId)
+			log.Println(b.Debug)
 			return true
 		}
 	}
+	debug.LogDebug(b.Debug, "Forbidden chat ", chatId)
 	return false
 }
 
@@ -94,9 +97,11 @@ func (b *Bot) IsAllowedChat(chatId int64) bool {
 func (b *Bot) IsAllowedUser(from User) bool {
 	for _, user := range b.AllowedUsers {
 		if from.Id == user.Id && from.Username == user.Username {
+			debug.LogDebug(b.Debug, "Allowed user ", from)
 			return true
 		}
 	}
+	debug.LogDebug(b.Debug, "Forbidden user ", from)
 	return false
 }
 
