@@ -16,7 +16,7 @@ type Bot struct {
 	AllowedUsers []User
 	AllowedChats []int64
 	Client       *http.Client
-	Debug bool
+	Debug        bool
 	// Firebase conf
 	FAppConf figa.FApp
 }
@@ -26,9 +26,9 @@ type Updates struct {
 	Updates []Update `json:"result"`
 }
 
-type SendMessageConfirm struct{
-	Ok bool `json:"ok"`
-	Message Message  `json:"result"`
+type SendMessageConfirm struct {
+	Ok      bool    `json:"ok"`
+	Message Message `json:"result"`
 }
 
 // This object represents an incoming update.

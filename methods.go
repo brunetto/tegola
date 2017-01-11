@@ -2,17 +2,17 @@ package tegola
 
 import (
 	"encoding/json"
-	"net/http"
 	"errors"
 	"io/ioutil"
+	"net/http"
 
 	"github.com/brunetto/goutils/debug"
 )
 
 func (b *Bot) GenericMethod(method string, payload []byte) ([]byte, error) {
 	var (
-		resp *http.Response
-		err error
+		resp     *http.Response
+		err      error
 		response []byte
 	)
 
@@ -39,7 +39,7 @@ func (b *Bot) SimplerGetUpdates() ([]Update, []Update, error) {
 		allowed   = []Update{}
 		forbidden = []Update{}
 	)
-	debug.LogDebug(b.Debug,"Get request")
+	debug.LogDebug(b.Debug, "Get request")
 	resp, err = b.Get("getUpdates")
 	defer resp.Body.Close()
 	if err != nil {
@@ -67,7 +67,7 @@ func (b *Bot) GetUpdates(pReq GetUpdatesPayload) ([]Update, []Update, error) {
 		u         Updates
 		allowed   = []Update{}
 		forbidden = []Update{}
-		payload []byte
+		payload   []byte
 	)
 
 	payload, err = json.Marshal(pReq)
@@ -91,16 +91,16 @@ func (b *Bot) GetUpdates(pReq GetUpdatesPayload) ([]Update, []Update, error) {
 
 	// Start option 2
 	/*
-	var respB []byte
-	respB, err = b.GenericMethod("getUpdates", payload)
-	if err != nil {
-		return allowed, forbidden, err
-	}
-	u = Updates{}
-	err = json.Unmarshal(respB, &u)
-	if err != nil {
-		return allowed, forbidden, err
-	}
+		var respB []byte
+		respB, err = b.GenericMethod("getUpdates", payload)
+		if err != nil {
+			return allowed, forbidden, err
+		}
+		u = Updates{}
+		err = json.Unmarshal(respB, &u)
+		if err != nil {
+			return allowed, forbidden, err
+		}
 	*/
 	// End option 2
 
@@ -157,12 +157,7 @@ func (b *Bot) SendMessage(msgReq SendMessagePayload) (Message, error) {
 	return m.Message, err
 }
 
-func (b *Bot) SetWebhook() {}
-
 func (b *Bot) GetMe()                  {}
-func (b *Bot) DeleteWebhook()          {}
-func (b *Bot) GetWebhookInfo()         {}
-func (b *Bot) WebhookInfo()            {}
 func (b *Bot) EditMessageText()        {}
 func (b *Bot) EditMessageCaption()     {}
 func (b *Bot) EditMessageReplyMarkup() {}

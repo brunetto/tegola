@@ -2,13 +2,13 @@ package tegola
 
 import (
 	"bytes"
-	"net/http"
-	"time"
-	"github.com/brunetto/goutils/debug"
 	"errors"
-	"strconv"
+	"github.com/brunetto/goutils/debug"
 	"io/ioutil"
 	"log"
+	"net/http"
+	"strconv"
+	"time"
 )
 
 var TelegramBotApiUrl string = "https://api.telegram.org/bot"
@@ -28,11 +28,11 @@ func (m *Message) UnixToHumanDate(timezone string) (string, error) {
 	return datetime, err
 }
 
-func CheckHttpErrors (resp *http.Response, url string) (*http.Response, error) {
+func CheckHttpErrors(resp *http.Response, url string) (*http.Response, error) {
 	var (
-		respBytes []byte
+		respBytes  []byte
 		respString string
-		err error
+		err        error
 	)
 	if resp.StatusCode != 200 {
 		respBytes, err = ioutil.ReadAll(resp.Body)
@@ -41,18 +41,18 @@ func CheckHttpErrors (resp *http.Response, url string) (*http.Response, error) {
 		}
 		respString = string(respBytes)
 		return resp, errors.New("HTTP error : " +
-					strconv.Itoa(resp.StatusCode) +
-					"\n" + respString +
-					"\n URL: " + url)
+			strconv.Itoa(resp.StatusCode) +
+			"\n" + respString +
+			"\n URL: " + url)
 	}
 	return resp, nil
 }
 
 func (b *Bot) Get(method string) (*http.Response, error) {
 	var (
-		url string
+		url  string
 		resp *http.Response
-		err error
+		err  error
 	)
 	url = TelegramBotApiUrl + b.BotToken + "/" + method
 	debug.LogDebug(b.Debug, "Bot get url: ", url)
@@ -66,9 +66,9 @@ func (b *Bot) Get(method string) (*http.Response, error) {
 
 func (b *Bot) Post(method string, payload []byte) (*http.Response, error) {
 	var (
-		url string
+		url  string
 		resp *http.Response
-		err error
+		err  error
 	)
 	url = TelegramBotApiUrl + b.BotToken + "/" + method
 	debug.LogDebug(b.Debug, "Bot post url: ", url)
