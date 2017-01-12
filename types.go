@@ -19,6 +19,8 @@ type Bot struct {
 	Debug        bool
 	// Firebase conf
 	FAppConf figa.FApp
+	UpdatesChanSize int
+	UpdatesChan chan Update
 }
 
 type Updates struct {

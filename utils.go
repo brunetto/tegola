@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"fmt"
 )
 
 var TelegramBotApiUrl string = "https://api.telegram.org/bot"
@@ -82,6 +83,11 @@ func (b *Bot) Post(method string, payload []byte) (*http.Response, error) {
 
 // IsAllowedChat checks if the incoming chat is allowed by the user rules
 func (b *Bot) IsAllowedChat(chatId int64) bool {
+	// If no allowed chats are listed, every chat is allowed
+	if len(b.AllowedChats) == 0 {
+		return true
+	}
+
 	for _, id := range b.AllowedChats {
 		if chatId == id {
 			debug.LogDebug(b.Debug, "Allowed chat ", chatId)
@@ -95,6 +101,11 @@ func (b *Bot) IsAllowedChat(chatId int64) bool {
 
 // IsAllowedUser checks if the incoming chat user is allowed by the user rules
 func (b *Bot) IsAllowedUser(from User) bool {
+	// If no allowed users are listed, every user is allowed
+	if len(b.AllowedUsers) == 0 {
+		return true
+	}
+
 	for _, user := range b.AllowedUsers {
 		if from.Id == user.Id && from.Username == user.Username {
 			debug.LogDebug(b.Debug, "Allowed user ", from)
@@ -117,8 +128,47 @@ func (b *Bot) AllowedMessage(m Message) bool {
 //}
 
 // Echo repeats last user message back to the chat
-func (b *Bot) Echo() {
+func (b *Bot) Echo (u Update) {
 
+	var (
+		reply Message
+
+	)
+		/*if !(b.AllowedMessage(u.Message)) {
+			return
+		}*/
+
+		messageText := u.Message.Text
+		chatId := strconv.Itoa(int(u.Message.Chat.Id))
+		sender := u.Message.From
+		date, err := u.Message.UnixToHumanDate(b.TimeZone)
+
+		if err != nil {
+			log.Println(err)
+		}
+
+		// Echo to admin
+		replyText := "Echo" + "\n====" +
+			"\nSender: " + sender.Username + " - id: " + strconv.Itoa(int(sender.Id)) +
+			"\nChat: " + chatId +
+			"\nTimestamp " + date +
+			"\nUpdate n.: " + strconv.Itoa(int(u.UpdateId)) +
+			"\nMessage n.: " + strconv.Itoa(int(u.Message.MessageId)) +
+			"\nMessage:\n " + messageText + "\n"
+
+		sp := SendMessagePayload{
+			ChatId: u.Message.Chat.Id/*b.AdminChats[0]*/,
+			Text:   replyText,
+		}
+
+		reply, err = b.SendMessage(sp)
+		if err != nil {
+			log.Println(err)
+		} else {
+
+			fmt.Println("Echoed message sent back  to chat " + strconv.Itoa(int(b.AdminChats[0])) + " is: ")
+			fmt.Println(reply.Text)
+		}
 }
 
 // EchoDebug debugs the bot back to the chat

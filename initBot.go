@@ -22,5 +22,6 @@ func NewBotFromJsonFile(fileName string) Bot {
 
 func InitBot(c Bot) Bot {
 	c.Client = &http.Client{Timeout: time.Second * 10}
+	c.UpdatesChan = make(chan Update, c.UpdatesChanSize)
 	return c
 }

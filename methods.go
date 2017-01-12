@@ -31,19 +31,18 @@ func (b *Bot) GenericMethod(method string, payload []byte) ([]byte, error) {
 	return response, err
 }
 
-func (b *Bot) SimplerGetUpdates() ([]Update, []Update, error) {
+func (b *Bot) SimplerGetUpdates() ([]Update, error) {
 	var (
 		resp      *http.Response
 		err       error
 		u         Updates
-		allowed   = []Update{}
-		forbidden = []Update{}
+		updates   = []Update{}
 	)
 	debug.LogDebug(b.Debug, "Get request")
 	resp, err = b.Get("getUpdates")
 	defer resp.Body.Close()
 	if err != nil {
-		return allowed, forbidden, errors.New("Failed getUpdates get requests: " + err.Error())
+		return updates, errors.New("Failed getUpdates get requests: " + err.Error())
 	}
 
 	u = Updates{}
@@ -51,41 +50,40 @@ func (b *Bot) SimplerGetUpdates() ([]Update, []Update, error) {
 	debug.LogDebug(b.Debug, "Decode response")
 	err = json.NewDecoder(resp.Body).Decode(&u)
 	if err != nil {
-		return allowed, forbidden, err
+		return updates, err
 	}
 
 	debug.LogDebug(b.Debug, "Filter updates")
-	allowed, forbidden = b.FilterAllowedUpdates(u)
+	//allowed, forbidden = b.FilterAllowedUpdates(u)
 
-	return allowed, forbidden, err
+	return u.Updates, err
 }
 
-func (b *Bot) GetUpdates(pReq GetUpdatesPayload) ([]Update, []Update, error) {
+func (b *Bot) GetUpdates(pReq GetUpdatesPayload) ([]Update, error) {
 	var (
 		resp      *http.Response
 		err       error
 		u         Updates
-		allowed   = []Update{}
-		forbidden = []Update{}
+		updates   = []Update{}
 		payload   []byte
 	)
 
 	payload, err = json.Marshal(pReq)
 	if err != nil {
-		return allowed, forbidden, err
+		return updates, err
 	}
 
 	// Start option 1
 	resp, err = b.Post("getUpdates", payload)
 	defer resp.Body.Close()
 	if err != nil {
-		return allowed, forbidden, err
+		return updates, err
 	}
 
 	u = Updates{}
 	err = json.NewDecoder(resp.Body).Decode(&u)
 	if err != nil {
-		return allowed, forbidden, err
+		return updates, err
 	}
 	// End option 1
 
@@ -104,17 +102,18 @@ func (b *Bot) GetUpdates(pReq GetUpdatesPayload) ([]Update, []Update, error) {
 	*/
 	// End option 2
 
-	allowed, forbidden = b.FilterAllowedUpdates(u)
+	// Now GetUpdates returns all the updates, they are going to be filtered after
+	//allowed, forbidden = b.FilterAllowedUpdates(u)
 
-	return allowed, forbidden, err
+	return updates, err
 }
 
-func (b *Bot) FilterAllowedUpdates(u Updates) ([]Update, []Update) {
+func (b *Bot) FilterAllowedUpdates(u []Update) ([]Update, []Update) {
 	var (
 		allowed   = []Update{}
 		forbidden = []Update{}
 	)
-	for _, Update := range u.Updates {
+	for _, Update := range u {
 		if b.AllowedMessage(Update.Message) {
 			allowed = append(allowed, Update)
 		} else {
