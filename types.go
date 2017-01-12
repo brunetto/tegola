@@ -18,9 +18,10 @@ type Bot struct {
 	Client       *http.Client
 	Debug        bool
 	// Firebase conf
-	FAppConf figa.FApp
+	FAppConf        figa.FApp
 	UpdatesChanSize int
-	UpdatesChan chan Update
+	UpdatesChan     chan Update
+	ListenRoute     string
 }
 
 type Updates struct {

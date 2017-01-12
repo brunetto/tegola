@@ -3,13 +3,14 @@ package tegola
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"github.com/brunetto/goutils/debug"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
+	"sync"
 	"time"
-	"fmt"
 )
 
 var TelegramBotApiUrl string = "https://api.telegram.org/bot"
@@ -127,17 +128,39 @@ func (b *Bot) AllowedMessage(m Message) bool {
 //
 //}
 
-// Echo repeats last user message back to the chat
-func (b *Bot) Echo (u Update) {
+func (b *Bot) Start(updatesHandler func(*Bot, *sync.WaitGroup)) error {
+	var (
+		wg  sync.WaitGroup
+		err error
+	)
+	debug.LogDebug(b.Debug, "Setting up handler")
 
+	http.HandleFunc(b.ListenRoute, b.WebhooksUpdatesHandler)
+
+	debug.LogDebug(b.Debug, "Listening for updates from webhook")
+
+	wg.Add(1)
+	go updatesHandler(b, &wg)
+
+	err = http.ListenAndServe("127.0.0.1:8443", nil)
+	close(b.UpdatesChan)
+	wg.Wait()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// Echo repeats last user message back to the chat
+func Echo(b *Bot, wg *sync.WaitGroup) {
+	defer wg.Done()
 	var (
 		reply Message
-
 	)
-		/*if !(b.AllowedMessage(u.Message)) {
-			return
-		}*/
-
+	/*if !(b.AllowedMessage(u.Message)) {
+		return
+	}*/
+	for u := range b.UpdatesChan {
 		messageText := u.Message.Text
 		chatId := strconv.Itoa(int(u.Message.Chat.Id))
 		sender := u.Message.From
@@ -148,6 +171,7 @@ func (b *Bot) Echo (u Update) {
 		}
 
 		// Echo to admin
+		// @TODO: format message
 		replyText := "Echo" + "\n====" +
 			"\nSender: " + sender.Username + " - id: " + strconv.Itoa(int(sender.Id)) +
 			"\nChat: " + chatId +
@@ -157,7 +181,7 @@ func (b *Bot) Echo (u Update) {
 			"\nMessage:\n " + messageText + "\n"
 
 		sp := SendMessagePayload{
-			ChatId: u.Message.Chat.Id/*b.AdminChats[0]*/,
+			ChatId: u.Message.Chat.Id, /*b.AdminChats[0]*/
 			Text:   replyText,
 		}
 
@@ -169,6 +193,7 @@ func (b *Bot) Echo (u Update) {
 			fmt.Println("Echoed message sent back  to chat " + strconv.Itoa(int(b.AdminChats[0])) + " is: ")
 			fmt.Println(reply.Text)
 		}
+	}
 }
 
 // EchoDebug debugs the bot back to the chat

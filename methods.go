@@ -33,10 +33,10 @@ func (b *Bot) GenericMethod(method string, payload []byte) ([]byte, error) {
 
 func (b *Bot) SimplerGetUpdates() ([]Update, error) {
 	var (
-		resp      *http.Response
-		err       error
-		u         Updates
-		updates   = []Update{}
+		resp    *http.Response
+		err     error
+		u       Updates
+		updates = []Update{}
 	)
 	debug.LogDebug(b.Debug, "Get request")
 	resp, err = b.Get("getUpdates")
@@ -61,11 +61,11 @@ func (b *Bot) SimplerGetUpdates() ([]Update, error) {
 
 func (b *Bot) GetUpdates(pReq GetUpdatesPayload) ([]Update, error) {
 	var (
-		resp      *http.Response
-		err       error
-		u         Updates
-		updates   = []Update{}
-		payload   []byte
+		resp    *http.Response
+		err     error
+		u       Updates
+		updates = []Update{}
+		payload []byte
 	)
 
 	payload, err = json.Marshal(pReq)
