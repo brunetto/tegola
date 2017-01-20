@@ -10,18 +10,20 @@ import (
 func NewBotFromJsonFile(fileName string) Bot {
 	var (
 		err error
-		c   = Bot{}
+		b   = Bot{}
 	)
-	err = conf.LoadJsonConf(fileName, &c)
+	err = conf.LoadJsonConf(fileName, &b)
 	if err != nil {
 		log.Fatal("Error reading JSON config file: ", err)
 	}
-	c = InitBot(c)
-	return c
+	b = InitBot(b)
+	return b
 }
 
-func InitBot(c Bot) Bot {
-	c.Client = &http.Client{Timeout: time.Second * 10}
-	c.UpdatesChan = make(chan Update, c.UpdatesChanSize)
-	return c
+func InitBot(b Bot) Bot {
+	b.Client = &http.Client{Timeout: time.Second * 10}
+	b.UpdatesChan = make(chan Update, b.UpdatesChanSize)
+	b.ListenRoute = "/"
+	//b.CommandRegString = `^\/(?P<command>[^@\s]+)@?(?:(?P<bot>\S+)|)\s?(?P<args>[\s\S]*)$`
+	return b
 }

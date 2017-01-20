@@ -157,9 +157,7 @@ func Echo(b *Bot, wg *sync.WaitGroup) {
 	var (
 		reply Message
 	)
-	/*if !(b.AllowedMessage(u.Message)) {
-		return
-	}*/
+
 	for u := range b.UpdatesChan {
 		messageText := u.Message.Text
 		chatId := strconv.Itoa(int(u.Message.Chat.Id))
@@ -190,10 +188,56 @@ func Echo(b *Bot, wg *sync.WaitGroup) {
 			log.Println(err)
 		} else {
 
-			fmt.Println("Echoed message sent back  to chat " + strconv.Itoa(int(b.AdminChats[0])) + " is: ")
+			fmt.Println("Echoed message sent back  to chat " + strconv.Itoa(int(u.Message.Chat.Id)) + " is: ")
 			fmt.Println(reply.Text)
 		}
 	}
+}
+
+// Echo repeats last user message back to the chat
+func EchoHandler(b *Bot, c CmdData, u Update) error {
+	var (
+		reply Message
+	)
+	messageText := u.Message.Text
+	chatId := strconv.Itoa(int(u.Message.Chat.Id))
+	sender := u.Message.From
+	date, err := u.Message.UnixToHumanDate(b.TimeZone)
+
+	if err != nil {
+		log.Println(err)
+	}
+
+	// Echo to admin
+	// @TODO: format message
+	replyText := "Echo" + "\n====" +
+		"\nSender: " + sender.Username + " - id: " + strconv.Itoa(int(sender.Id)) +
+		"\nChat: " + chatId +
+		"\nTimestamp " + date +
+		"\nUpdate n.: " + strconv.Itoa(int(u.UpdateId)) +
+		"\nMessage n.: " + strconv.Itoa(int(u.Message.MessageId)) +
+		"\nMessage:\n " + messageText + "\n"
+
+	if c.Cmd != "" {
+		replyText += "Found command " + c.Cmd + "\n"
+	} else {
+		replyText += "No command found.\n"
+	}
+
+	sp := SendMessagePayload{
+		ChatId: u.Message.Chat.Id, /*b.AdminChats[0]*/
+		Text:   replyText,
+	}
+
+	reply, err = b.SendMessage(sp)
+	if err != nil {
+		log.Println(err)
+	} else {
+
+		fmt.Println("Echoed message sent back  to chat " + strconv.Itoa(int(u.Message.Chat.Id)) + " is: ")
+		fmt.Println(reply.Text)
+	}
+	return nil
 }
 
 // EchoDebug debugs the bot back to the chat
@@ -210,3 +254,9 @@ func (b *Bot) GhostDebug() {
 func (b *Bot) ParentalControl() {
 
 }
+
+//func (b *Bot) Shutdown() {
+//	if b.MongoSession {
+//		b.MongoSession.Close()
+//	}
+//}

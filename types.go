@@ -1,9 +1,11 @@
 package tegola
 
 import (
-	"github.com/brunetto/figa"
 	"net/http"
+	"gopkg.in/mgo.v2"
 )
+
+const CommandRegString = `^\/(?P<command>[^@\s]+)@?(?:(?P<bot>\S+)|)\s?(?P<args>[\s\S]*)$`
 
 type Bot struct {
 	BotName      string
@@ -17,11 +19,17 @@ type Bot struct {
 	AllowedChats []int64
 	Client       *http.Client
 	Debug        bool
-	// Firebase conf
-	FAppConf        figa.FApp
 	UpdatesChanSize int
 	UpdatesChan     chan Update
 	ListenRoute     string
+	// Firebase conf
+	//FAppConf        figa.FApp
+	//AWSUser string
+	//AWSKey string
+	//AWSSecretKey string
+	MongoAuth mgo.DialInfo
+	MongoSession *mgo.Session
+	//CommandRegString string
 }
 
 type Updates struct {
