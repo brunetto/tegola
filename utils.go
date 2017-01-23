@@ -142,7 +142,7 @@ func (b *Bot) Start(updatesHandler func(*Bot, *sync.WaitGroup)) error {
 	wg.Add(1)
 	go updatesHandler(b, &wg)
 
-	err = http.ListenAndServe("127.0.0.1:8443", nil)
+	err = http.ListenAndServe(b.ListenURL + ":" + b.ListenPort, nil)
 	close(b.UpdatesChan)
 	wg.Wait()
 	if err != nil {
@@ -254,6 +254,7 @@ func (b *Bot) GhostDebug() {
 func (b *Bot) ParentalControl() {
 
 }
+
 
 //func (b *Bot) Shutdown() {
 //	if b.MongoSession {

@@ -22,6 +22,8 @@ type Bot struct {
 	UpdatesChanSize int
 	UpdatesChan     chan Update
 	ListenRoute     string
+	ListenPort      string
+	ListenURL	string
 	// Firebase conf
 	//FAppConf        figa.FApp
 	//AWSUser string

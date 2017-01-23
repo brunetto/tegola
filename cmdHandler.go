@@ -4,6 +4,7 @@ import (
 	"sync"
 	"errors"
 	"regexp"
+	"log"
 )
 
 type CmdHandler func( *Bot, CmdData, Update ) error
@@ -13,9 +14,15 @@ type CmdManager struct {
 }
 
 func NewCmdManager () *CmdManager {
-	var manager = &CmdManager{Routes: map[string]CmdHandler{}}
-	manager.Routes["default"] = func (*Bot, CmdData, Update) error {
-		return nil
+	var (
+		manager = &CmdManager{Routes: map[string]CmdHandler{}}
+		err error
+	)
+	err = manager.AddRoute("default", DoNothing, true)
+	err = manager.AddRoute("start", SayHi, true)
+	err = manager.AddRoute("help", Help, true)
+	if err != nil {
+		log.Fatal(err)
 	}
 	return manager
 }
@@ -101,4 +108,56 @@ func DetectCmd (text string) CmdData {
 	cmdData.Args = res["args"]
 
 	return cmdData
+}
+
+func DoNothing(b *Bot, c CmdData, u Update) error {return nil}
+
+func SayHi(b *Bot, c CmdData, u Update) error {
+	var (
+		err error
+	)
+
+	sender := u.Message.From
+
+	if err != nil {
+		log.Println(err)
+	}
+
+
+	replyText := "Hi " + sender.Username + " !\n"
+
+	sp := SendMessagePayload{
+		ChatId: u.Message.Chat.Id,
+		Text:   replyText,
+	}
+
+	_, err = b.SendMessage(sp)
+	if err != nil {
+		log.Println(err)
+	}
+	return nil
+}
+
+func Help(b *Bot, c CmdData, u Update) error {
+	var (
+		err error
+	)
+
+	if err != nil {
+		log.Println(err)
+	}
+
+
+	replyText := "Usage here\n"
+
+	sp := SendMessagePayload{
+		ChatId: u.Message.Chat.Id,
+		Text:   replyText,
+	}
+
+	_, err = b.SendMessage(sp)
+	if err != nil {
+		log.Println(err)
+	}
+	return nil
 }
