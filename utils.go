@@ -73,7 +73,7 @@ func (b *Bot) Post(method string, payload []byte) (*http.Response, error) {
 		err  error
 	)
 	url = TelegramBotApiUrl + b.BotToken + "/" + method
-	debug.LogDebug(b.Debug, "Bot post url: ", url)
+	//debug.LogDebug(b.Debug, "Bot post url: ", url)
 	resp, err = b.Client.Post(url, "application/json", bytes.NewBuffer(payload))
 	if err != nil {
 		return resp, err
@@ -131,18 +131,66 @@ func (b *Bot) AllowedMessage(m Message) bool {
 func (b *Bot) Start(updatesHandler func(*Bot, *sync.WaitGroup)) error {
 	var (
 		wg  sync.WaitGroup
+		lastUpdateId int64
 		err error
+		updates []Update
+		nThreads int
+		loopSleep int
 	)
-	debug.LogDebug(b.Debug, "Setting up handler")
 
-	http.HandleFunc(b.ListenRoute, b.WebhooksUpdatesHandler)
+	nThreads = b.Threads
+	if nThreads == 0 {
+		nThreads = 1
+	}
+	// Start updates handlers
+	for i:=0; i<nThreads; i++ {
+		wg.Add(1)
+		go updatesHandler(b, &wg)
+	}
 
-	debug.LogDebug(b.Debug, "Listening for updates from webhook")
+	// Start webhook listener
+	if b.UpdateMode == "" || b.UpdateMode == "webhooks" {
 
-	wg.Add(1)
-	go updatesHandler(b, &wg)
+		debug.LogDebug(b.Debug, "Setting up handler")
 
-	err = http.ListenAndServe(b.ListenURL + ":" + b.ListenPort, nil)
+		http.HandleFunc(b.ListenRoute, b.WebhooksUpdatesHandler)
+
+		debug.LogDebug(b.Debug, "Listening for updates from webhook")
+
+		err = http.ListenAndServe(b.ListenURL+":"+b.ListenPort, nil)
+	// Start getUpdates loop
+	} else if b.UpdateMode == "getUpdates" {
+
+		loopSleep = b.LoopSleep
+		if loopSleep == 0 {
+			loopSleep = 1000
+		}
+
+		debug.LogDebug(b.Debug, "Starting get updates loop")
+		for {
+			gp := GetUpdatesPayload{}
+			if lastUpdateId != 0 {
+				gp.Offset = lastUpdateId + 1
+			}
+			// Get updates
+			updates, err = b.GetUpdates(gp)
+			if err != nil {
+				break
+			}
+
+			// Send updates to handler
+			for _, u := range updates {
+				b.UpdatesChan <- u
+				lastUpdateId = u.UpdateId
+			}
+
+			// Wait
+			time.Sleep(time.Duration(loopSleep) * time.Millisecond)
+		}
+	} else {
+		log.Fatal("Start: Wrong update mode: ", b.UpdateMode)
+	}
+
 	close(b.UpdatesChan)
 	wg.Wait()
 	if err != nil {

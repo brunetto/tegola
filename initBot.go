@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"time"
-	"golang.org/x/tools/go/gcimporter15/testdata"
 )
 
 func NewBotFromJsonFile(fileName string) Bot {
@@ -41,4 +40,7 @@ func (b *Bot)Init() {
 	b.UpdatesChan = make(chan Update, b.UpdatesChanSize)
 	b.ListenRoute = "/" + b.BotToken + "/"
 	b.ListenPort = "8443"
+	b.Threads = 1
+	b.UpdateMode = "webhooks"
+	b.LoopSleep = 1000
 }

@@ -105,7 +105,7 @@ func (b *Bot) GetUpdates(pReq GetUpdatesPayload) ([]Update, error) {
 	// Now GetUpdates returns all the updates, they are going to be filtered after
 	//allowed, forbidden = b.FilterAllowedUpdates(u)
 
-	return updates, err
+	return u.Updates, err
 }
 
 func (b *Bot) FilterAllowedUpdates(u []Update) ([]Update, []Update) {

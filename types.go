@@ -32,6 +32,9 @@ type Bot struct {
 	MongoAuth mgo.DialInfo
 	MongoSession *mgo.Session
 	//CommandRegString string
+	UpdateMode string
+	Threads int
+	LoopSleep int
 }
 
 type Updates struct {
