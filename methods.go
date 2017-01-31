@@ -123,9 +123,9 @@ func (b *Bot) FilterAllowedUpdates(u []Update) ([]Update, []Update) {
 	return allowed, forbidden
 }
 
-func (b *Bot) SendSimpleMessage(msgText string) (Message, error) {
+func (b *Bot) SendSimpleMessage(chatId int64, msgText string) (Message, error) {
 	var (
-		msgReq = SendMessagePayload{ChatId: b.ChatId, Text: msgText}
+		msgReq = SendMessagePayload{ChatId: chatId, Text: msgText}
 		m      Message
 		err    error
 	)

@@ -8,30 +8,40 @@ import (
 const CommandRegString = `^\/(?P<command>[^@\s]+)@?(?:(?P<bot>\S+)|)\s?(?P<args>[\s\S]*)$`
 
 type Bot struct {
+	// Bot name
 	BotName      string
+	// Bot username
 	BotUser      string
+	// Bot token given by the BotFather
 	BotToken     string
-	ChatId       int64
+	// Preferred timezone to convert Unix time to date
 	TimeZone     string
+	// Admin users
 	AdminUsers   []User
+	// Admin chats
 	AdminChats   []int64
+	// Users allowed to interact with the bot (empty means everyone is allowed)
 	AllowedUsers []User
+	// Chats allowed to interact with the bot (empty means every chat is allowed)
 	AllowedChats []int64
+	// HTTP client to perform HTTP requests (GET, POST)
 	Client       *http.Client
+	// Debug flag for verbose logging
 	Debug        bool
+	// Log level (in case we decide to use it)
+	LogLevel string
+	// Size of the channel containing the updates to be streamed to the updates handler
 	UpdatesChanSize int
+	// Channel to stream the updated to the updates handler
 	UpdatesChan     chan Update
+	// Route where to listen for updates (updates through webhooks)
 	ListenRoute     string
+	// Port where to listen for updates (updates through webhooks)
 	ListenPort      string
+	// Base URL where to listen for updates (updates through webhooks)
 	ListenURL	string
-	// Firebase conf
-	//FAppConf        figa.FApp
-	//AWSUser string
-	//AWSKey string
-	//AWSSecretKey string
 	MongoAuth mgo.DialInfo
 	MongoSession *mgo.Session
-	//CommandRegString string
 	UpdateMode string
 	Threads int
 	LoopSleep int
