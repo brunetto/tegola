@@ -17,10 +17,10 @@ func (b *Bot) GenericMethod(method string, payload []byte) ([]byte, error) {
 	)
 
 	resp, err = b.Post(method, payload)
-	defer resp.Body.Close()
 	if err != nil {
 		return response, err
 	}
+	defer resp.Body.Close()
 
 	// Read the response into a byte array
 	response, err = ioutil.ReadAll(resp.Body)
@@ -40,10 +40,10 @@ func (b *Bot) SimplerGetUpdates() ([]Update, error) {
 	)
 	debug.LogDebug(b.Debug, "Get request")
 	resp, err = b.Get("getUpdates")
-	defer resp.Body.Close()
 	if err != nil {
 		return updates, errors.New("Failed getUpdates get requests: " + err.Error())
 	}
+	defer resp.Body.Close()
 
 	u = Updates{}
 
@@ -75,10 +75,10 @@ func (b *Bot) GetUpdates(pReq GetUpdatesPayload) ([]Update, error) {
 
 	// Start option 1
 	resp, err = b.Post("getUpdates", payload)
-	defer resp.Body.Close()
 	if err != nil {
 		return updates, err
 	}
+	defer resp.Body.Close()
 
 	u = Updates{}
 	err = json.NewDecoder(resp.Body).Decode(&u)
@@ -147,10 +147,10 @@ func (b *Bot) SendMessage(msgReq SendMessagePayload) (Message, error) {
 	}
 
 	resp, err = b.Post("sendMessage", msg)
-	defer resp.Body.Close()
 	if err != nil {
 		return Message{}, err
 	}
+	defer resp.Body.Close()
 
 	err = json.NewDecoder(resp.Body).Decode(&m)
 	return m.Message, err
